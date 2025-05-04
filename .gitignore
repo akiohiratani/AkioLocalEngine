@@ -19,3 +19,6 @@ instance/
 dist/
 build/
 *.egg-info/
+
+## テスト用
+output/*.txt

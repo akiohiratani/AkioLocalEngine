@@ -22,7 +22,7 @@ def get_horses_for_name():
 
 @horses_bp.route('/race', methods=['GET'])
 def get_horses_for_race_id():
-    ## http://127.0.0.1:5000/api/horses/race?id=0050
+    ## http://127.0.0.1:5000/api/horses/race?id=0052
     id = request.args.get('id', '')
     if not id:
         return jsonify({"error": {"status_code": 400, "message": "idを指定してください"}}), 400

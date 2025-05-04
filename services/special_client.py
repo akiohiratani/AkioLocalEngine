@@ -1,10 +1,14 @@
 from services.base_client import BaseClient
 import re
+from urllib.parse import urlparse
+from typing import List
+from output.output import Output
 
 class SpecialClient(BaseClient):
 
     # url
     BASE_URL = "https://race.netkeiba.com/special/index.html?id={}"
+    MAX_RESULTS = 10
 
     # コンストラクタ
     def __init__(self):
@@ -23,3 +27,18 @@ class SpecialClient(BaseClient):
                 if match:
                     race_id = match.group(1)
         return race_id
+    def get_past_race_ids(self, id:str)->List[str]:
+        url = self.BASE_URL.format(id)
+        soup = self.get_soup(url)
+        Output().outputTableForId(soup, "All_Special_Table")
+        soup.find("table", id = "All_Special_Table")
+        race_ids = []
+        for tr in soup.find_all('tr')[1:self.MAX_RESULTS+1]:
+            a = tr.find('a', href=True)
+            if a and '/race/' in a['href']:
+                link = f'href="{a["href"]}"'
+                url = re.search(r'href="([^"]+)"', link).group(1)
+                path = urlparse(url).path  # "/race/202405020611/"
+                race_id = path.strip('/').split('/')[-1]
+                race_ids.append(race_id)
+        return race_ids
