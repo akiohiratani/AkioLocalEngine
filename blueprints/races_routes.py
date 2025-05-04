@@ -3,6 +3,7 @@ from services.schedule_client import ScheduleClient
 from services.get_holidays_usecase import GetHolidaysUsecase
 from services.special_client import SpecialClient
 from services.race_result_client import RaceResultClient
+from services.export_race_data import ExportRaceData
 
 races_bp = Blueprint('races', __name__, url_prefix='/api/races')
 
@@ -36,9 +37,12 @@ def output_topic_race():
         past_race_ids = specialClient.get_past_race_ids(id)
 
         ## 10年分のレース結果取得
-        race_result = RaceResultClient().get_race_results(past_race_ids)
+        race_results = RaceResultClient().get_race_results(past_race_ids)
+
+        ## csv出力
+        result = ExportRaceData().export_horse_data_to_csv(race_results)
        
-        return jsonify({"data": "Success"})
+        return jsonify({"data": result})
     except Exception as e:
         return jsonify({
             "error": {
