@@ -1,0 +1,21 @@
+# Pythonキャッシュ
+__pycache__/
+*.pyc
+
+# 仮想環境（念のため再掲、venv名に注意）
+venv/
+.venv/
+
+# テストやカバレッジ
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Flaskインスタンス・設定
+instance/
+*.db
+
+# ビルド成果物
+dist/
+build/
+*.egg-info/
