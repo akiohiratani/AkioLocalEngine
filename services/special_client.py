@@ -8,7 +8,7 @@ class SpecialClient(BaseClient):
 
     # url
     BASE_URL = "https://race.netkeiba.com/special/index.html?id={}"
-    MAX_RESULTS = 10
+    MAX_RESULTS = 3
 
     # コンストラクタ
     def __init__(self):

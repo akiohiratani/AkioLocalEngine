@@ -17,13 +17,16 @@ class Usecase:
                 formatted = current_day.strftime("%m/%d") + f"({weekdays_jp[current_day.weekday()]})"
                 weekends.append(formatted)
         return weekends
-    def get_horse_ids(self, list:List[RaceResultInfoDto]):
+    def get_horse_ids(self, raceResults:List[RaceResultInfoDto]):
         """
         レース結果から出場した馬のIdのリストを返却する
         """
-        return
-    def get_joceky_ids(self, list:List[RaceResultInfoDto]):
+        horse_ids = [raceResult.horse_id for raceResult in raceResults]
+        return list(set(horse_ids))
+    
+    def get_joceky_ids(self, raceResults:List[RaceResultInfoDto]):
         """
         レース結果から出場した騎手のIdのリストを返却する
         """
-        return
+        jockey_ids = [raceResult.jockey_id for raceResult in raceResults]
+        return list(set(jockey_ids))

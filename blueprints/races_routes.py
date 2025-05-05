@@ -4,6 +4,8 @@ from services.usecase import Usecase
 from services.special_client import SpecialClient
 from services.race_result_client import RaceResultClient
 from services.export_race_data import ExportRaceData
+from services.horce_client import HorseClient
+from services.jockey_client import JockeyClient
 
 races_bp = Blueprint('races', __name__, url_prefix='/api/races')
 
@@ -39,9 +41,19 @@ def output_topic_race():
         ## 10年分のレース結果取得
         race_results = RaceResultClient().get_race_results(past_race_ids)
 
+        ## 出走した競走馬リストを取得
+        horse_ids = Usecase().get_horse_ids(race_results)
+        horses = HorseClient().get_horses(horse_ids)
+
+        ## 出走した騎手リストを取得
+        joceky_ids = Usecase().get_joceky_ids(race_results)
+        jos = JockeyClient().get_jockeys(joceky_ids)
+
         ## csv出力
-        result = ExportRaceData().export_horse_data_to_csv(race_results)
-       
+        exportRaceData = ExportRaceData()
+        result = exportRaceData.export_past_race_data_to_csv(race_results)
+        result = exportRaceData.export_horse_history(horses)
+
         return jsonify({"data": result})
     except Exception as e:
         return jsonify({

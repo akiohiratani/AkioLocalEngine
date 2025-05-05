@@ -16,10 +16,10 @@ class HorseClient(BaseClient):
         horses = []
         
         # ThreadPoolExecutorで並列処理
-        with ThreadPoolExecutor(max_workers=20) as executor:
+        with ThreadPoolExecutor() as executor:
             # 各馬IDに対してタスクを登録
             future_to_id = {
-                executor.submit(self.get_hours, horse_id): horse_id
+                executor.submit(self.get_horse, horse_id): horse_id
                 for horse_id in ids
             }
             
@@ -35,7 +35,7 @@ class HorseClient(BaseClient):
         
         return horses
 
-    def get_hours(self, id: str) -> HorseInfoDTO:
+    def get_horse(self, id: str) -> HorseInfoDTO:
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
         
