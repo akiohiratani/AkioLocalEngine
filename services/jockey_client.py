@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from services.base_client import BaseClient
 from typing import List
 import re
-from output.output import Output
 from domain.jockey_history import JocekeyHistoryDto
 
 class JockeyClient(BaseClient):

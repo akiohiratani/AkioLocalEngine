@@ -2,7 +2,6 @@ from services.base_client import BaseClient
 import re
 from urllib.parse import urlparse
 from typing import List
-from output.output import Output
 
 class SpecialClient(BaseClient):
 
@@ -30,7 +29,6 @@ class SpecialClient(BaseClient):
     def get_past_race_ids(self, id:str)->List[str]:
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
-        Output().outputTableForId(soup, "All_Special_Table")
         soup.find("table", id = "All_Special_Table")
         race_ids = []
         for tr in soup.find_all('tr')[1:self.MAX_RESULTS+1]:

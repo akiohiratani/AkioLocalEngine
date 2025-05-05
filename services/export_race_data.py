@@ -24,7 +24,7 @@ class ExportRaceData(ExportBase):
         """
         # 出力ディレクトリの作成
         race_df = pd.DataFrame([asdict(result) for result in race_results])
-        race_df.to_csv(f"{self.output_dir}/dataset_past.csv", index=False, encoding="utf-8-sig")
+        race_df.to_csv(f"{self.output_dir}/dataset_race.csv", index=False, encoding="utf-8-sig")
 
         return self.output_path
     
