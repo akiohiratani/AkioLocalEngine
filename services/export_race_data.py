@@ -24,7 +24,7 @@ class ExportRaceData(ExportBase):
         """
         # 出力ディレクトリの作成
         race_df = pd.DataFrame([asdict(result) for result in race_results])
-        race_df.to_csv(f"{self.output_dir}/detailed_race_results_from_the_past.csv", index=False, encoding="utf-8-sig")
+        race_df.to_csv(f"{self.output_dir}/dataset_past.csv", index=False, encoding="utf-8-sig")
 
         return self.output_path
     
@@ -51,6 +51,6 @@ class ExportRaceData(ExportBase):
             "horse_id", "horse_name", "horse_sex", "horse_father", "horse_grandfather"
         ] + [c for c in race_df.columns if c not in ("horse_id", "horse_name", "horse_sex", "horse_father", "horse_grandfather")]
         race_df = race_df[cols]
-        race_df.to_csv(f"{self.output_dir}/race_history_details.csv", index=False, encoding="utf-8-sig")
+        race_df.to_csv(f"{self.output_dir}/dataset_horse.csv", index=False, encoding="utf-8-sig")
 
         return self.output_path

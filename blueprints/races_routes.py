@@ -45,15 +45,12 @@ def output_topic_race():
         horse_ids = Usecase().get_horse_ids(race_results)
         horses = HorseClient().get_horses(horse_ids)
 
-        ## 出走した騎手リストを取得
-        joceky_ids = Usecase().get_joceky_ids(race_results)
-        jos = JockeyClient().get_jockeys(joceky_ids)
-
         ## csv出力
         exportRaceData = ExportRaceData()
         result = exportRaceData.export_past_race_data_to_csv(race_results)
         result = exportRaceData.export_horse_history(horses)
-
+        exportRaceData.compress_output()
+        
         return jsonify({"data": result})
     except Exception as e:
         return jsonify({
