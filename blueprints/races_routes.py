@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from services.schedule_client import ScheduleClient
-from services.get_holidays_usecase import GetHolidaysUsecase
+from services.usecase import Usecase
 from services.special_client import SpecialClient
 from services.race_result_client import RaceResultClient
 from services.export_race_data import ExportRaceData
@@ -11,7 +11,7 @@ races_bp = Blueprint('races', __name__, url_prefix='/api/races')
 def get_topic_race():
     ## http://127.0.0.1:5000/api/races/g_race
     try:
-        days = GetHolidaysUsecase().execute()
+        days = Usecase().get_holidays()
         race_list = ScheduleClient().search_g_race_list(days)
         return jsonify({
             "data": [r.to_dict() for r in race_list],

@@ -54,9 +54,17 @@ class RaceResultClient(BaseClient):
                 frame_number = cells[1].find('span').text.strip()
                 horse_number = cells[2].text.strip()
                 horse_name = cells[3].find('a').text.strip()
+
+                ## 馬のIDを取得
+                horse_href = cells[3].find('a').get("href")
+                horse_id = horse_href.split('/')[2]
                 sex_age = cells[4].text.strip()
                 weight_carried = cells[5].text.strip()
                 jockey = cells[6].find('a').text.strip()
+
+                ## 騎手のIDを取得
+                jockey_href = cells[6].find('a').get("href")
+                jockey_id = jockey_href.split('/')[4]
                 time = cells[7].text.strip()
                 margin = cells[8].text.strip()
                 time_index = cells[9].text.strip()  # プレミアム会員でない場合は「**」等
@@ -71,9 +79,11 @@ class RaceResultClient(BaseClient):
                     frame_number=frame_number,
                     horse_number=horse_number,
                     horse_name=horse_name,
+                    horse_id=horse_id,
                     sex_age=sex_age,
                     weight_carried=weight_carried,
                     jockey=jockey,
+                    jockey_id=jockey_id,
                     time=time,
                     margin=margin,
                     time_index=time_index,
