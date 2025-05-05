@@ -5,7 +5,9 @@ from services.special_client import SpecialClient
 from services.race_result_client import RaceResultClient
 from services.export_race_data import ExportRaceData
 from services.horce_client import HorseClient
+from services.race_client import RaceClient
 from services.jockey_client import JockeyClient
+from services.base.dataset_type import DatasetType
 
 races_bp = Blueprint('races', __name__, url_prefix='/api/races')
 
@@ -33,22 +35,32 @@ def output_topic_race():
     try:
         id = "0052"
         specialClient = SpecialClient()
+        raceClient = RaceClient()
+        horseClient = HorseClient()
 
+        # 検証用・テスト用データ作成
+
+        ## 今回出走する、競走馬の取得
         race_id = specialClient.get_race_id(id)
-        ## 10年分のレースid取得
-        past_race_ids = specialClient.get_past_race_ids(id)
+        test_horse_ids = raceClient.get_horse_ids(race_id)
+        test_horse = horseClient.get_horses(test_horse_ids)
 
-        ## 10年分のレース結果取得
-        race_results = RaceResultClient().get_race_results(past_race_ids)
+        # 学習用データ作成
+        ## 過去分のレースid取得
+        train_race_ids = specialClient.get_past_race_ids(id)
 
-        ## 出走した競走馬リストを取得
-        horse_ids = Usecase().get_horse_ids(race_results)
-        horses = HorseClient().get_horses(horse_ids)
+        ## 過去分のレース結果取得
+        train_race_results = RaceResultClient().get_race_results(train_race_ids)
+
+        ## 過去に出走した競走馬リストを取得
+        train_horse_ids = Usecase().get_horse_ids(train_race_results)
+        train_horses = horseClient.get_horses(train_horse_ids)
 
         ## csv出力
         exportRaceData = ExportRaceData()
-        result = exportRaceData.export_past_race_data_to_csv(race_results)
-        result = exportRaceData.export_horse_history(horses)
+        result = exportRaceData.export_horse_history(test_horse, DatasetType.TEST)
+        result = exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)
+        result = exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
         exportRaceData.compress_output()
         
         return jsonify({"data": result})

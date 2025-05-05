@@ -12,6 +12,10 @@ class RaceClient(BaseClient):
 
     # 競走馬の情報を取得
     def get_horse_ids(self, id:str)->List[str]:
+        """
+        レースIdから、競走馬のIdを取得
+        
+        """
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
 
@@ -24,3 +28,21 @@ class RaceClient(BaseClient):
             if m:
                 horse_ids.append(m.group(1))
         return horse_ids
+    
+    def get_jockey_ids(self, id:str)->List[str]:
+        """
+        レースIdから、ジョッキーのIdを取得
+        
+        """
+        url = self.BASE_URL.format(id)
+        soup = self.get_soup(url)
+
+        # 馬名リンク（<td class="Jockey">内の<a href=.../jockey/result/recent/数字5桁>）を全て取得
+        jockey_links = soup.select("td.Jockey a[href*='/jockey/result/recent/']")
+        jockey_ids = []
+        for jockey_link in jockey_links:
+            # href属性からid（5桁の数字）を正規表現で抽出
+            m = re.search(r'/horse/(\d{5})', jockey_link['href'])
+            if m:
+                jockey_ids.append(m.group(1))
+        return jockey_ids
