@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from services.schedule_client import ScheduleClient
 from services.usecase import Usecase
 from services.special_client import SpecialClient
@@ -29,11 +29,13 @@ def get_topic_race():
             }
         }), 500
     
-@races_bp.route('/data', methods=['GET'])
+@races_bp.route('/data', methods=['POST'])
 def output_topic_race():
     ## http://127.0.0.1:5000/api/races/data
     try:
-        id = "0052"
+        data = request.get_json()  # JSONデータを取得
+        id = data.get('id')      # 'id'キーの値（配列）を取り出す
+
         specialClient = SpecialClient()
         raceClient = RaceClient()
         horseClient = HorseClient()
