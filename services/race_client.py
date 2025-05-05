@@ -1,6 +1,7 @@
 from services.base_client import BaseClient
 from typing import List
 import re
+from domain.horse import HorseDto
 
 class RaceClient(BaseClient):
     # url
@@ -46,3 +47,73 @@ class RaceClient(BaseClient):
             if m:
                 jockey_ids.append(m.group(1))
         return jockey_ids
+
+    def get_candidate_list(self, id:str)->List[HorseDto]:
+        url = self.BASE_URL.format(id)
+        soup = self.get_soup(url)
+        table = soup.find("table", class_="Shutuba_Table RaceTable01 ShutubaTable")
+
+        # 馬情報が含まれる行を全て取得
+        rows = table.find_all('tr', class_='HorseList')        
+        horse_list = []
+        for tr in rows:
+            # 馬番を取得
+            number_cell = tr.find('td', class_='Umaban')
+            number = number_cell.get_text(strip=True) if number_cell else ''
+            
+            # 馬名を取得
+            name_span = tr.find('span', class_='HorseName')
+            name = name_span.get_text(strip=True) if name_span else ''
+
+            # 馬のId取得
+            ## 失敗したら諦める
+            horse_id = ""
+            try:
+                horse_href = name_span.find('a').get("href")
+                horse_id = horse_href.split('/')[4]
+            except:
+                print("Fail Get Horse Id")
+
+            # 性齢を取得
+            sex_age_cell = tr.find('td', class_='Barei')
+            sex_age = sex_age_cell.get_text(strip=True) if sex_age_cell else ''
+            
+            # 斤量を取得
+            carried_cells = tr.find_all('td', class_='Txt_C')
+            if carried_cells:
+                carried = carried_cells[0].get_text(strip=True)
+            else:
+                carried = ''
+            
+            # 騎手を取得
+            jockey_cell = tr.find('td', class_='Jockey')
+            jockey = jockey_cell.get_text(strip=True) if jockey_cell else ''
+
+            # 騎手のId取得
+            ## 失敗したら諦める
+            jockey_id = ""
+            try:
+                jockey_href = jockey_cell.find('a').get("href")
+                jockey_id = jockey_href.split('/')[6]
+            except:
+                print("Fail Get Jocekey Id")
+
+            # 調教師を取得
+            trainer_cell = tr.find('td', class_='Trainer')
+            trainer = trainer_cell.get_text(strip=True) if trainer_cell else ''
+            
+            # DTOを作成してリストに追加
+            horse_list.append(
+                HorseDto(
+                    number=number,
+                    horse_id=horse_id,
+                    name=name, 
+                    sex_age=sex_age, 
+                    carried=carried, 
+                    jockey_id=jockey_id,
+                    jockey=jockey, 
+                    trainer=trainer
+                )
+            )
+        
+        return horse_list

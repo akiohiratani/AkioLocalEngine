@@ -9,6 +9,7 @@ from dataclasses import asdict
 from typing import List
 from services.base.base_export import ExportBase
 from domain.horce_info import HorseInfoDTO
+from domain.horse import HorseDto
 from services.base.dataset_type import DatasetType
 
 # 馬情報クラスのインポート（添付ファイルから）
@@ -53,5 +54,12 @@ class ExportRaceData(ExportBase):
         ] + [c for c in race_df.columns if c not in ("horse_id", "horse_name", "horse_sex", "horse_father", "horse_grandfather")]
         race_df = race_df[cols]
         race_df.to_csv(f"{self.output_dir}/{type}_dataset_horse.csv", index=False, encoding="utf-8-sig")
+
+        return self.output_path
+    
+    def export_candidate_list(self, horse_list: List[HorseDto], type: DatasetType):
+        """出馬表のCSV出力"""
+        race_df = pd.DataFrame([asdict(result) for result in horse_list])
+        race_df.to_csv(f"{self.output_dir}/{type}_dataset_candidate_list.csv", index=False, encoding="utf-8-sig")
 
         return self.output_path
