@@ -35,6 +35,7 @@ def output_topic_race():
     try:
         data = request.get_json()  # JSONデータを取得
         id = data.get('id')      # 'id'キーの値（配列）を取り出す
+        years = data.get('years')      # 'years'キーの値（配列）を取り出す
 
         specialClient = SpecialClient()
         raceClient = RaceClient()
@@ -52,7 +53,7 @@ def output_topic_race():
 
         # 学習用データ作成
         ## 過去分のレースid取得
-        train_race_ids = specialClient.get_past_race_ids(id)
+        train_race_ids = specialClient.get_past_race_ids(id, years)
 
         ## 過去分のレース結果取得
         train_race_results = RaceResultClient().get_race_results(train_race_ids)

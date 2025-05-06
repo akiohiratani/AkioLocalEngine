@@ -7,7 +7,6 @@ class SpecialClient(BaseClient):
 
     # url
     BASE_URL = "https://race.netkeiba.com/special/index.html?id={}"
-    MAX_RESULTS = 2
 
     # コンストラクタ
     def __init__(self):
@@ -26,12 +25,12 @@ class SpecialClient(BaseClient):
                 if match:
                     race_id = match.group(1)
         return race_id
-    def get_past_race_ids(self, id:str)->List[str]:
+    def get_past_race_ids(self, id:str, max_results)->List[str]:
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
         soup.find("table", id = "All_Special_Table")
         race_ids = []
-        for tr in soup.find_all('tr')[1:self.MAX_RESULTS+1]:
+        for tr in soup.find_all('tr')[1:max_results+1]:
             a = tr.find('a', href=True)
             if a and '/race/' in a['href']:
                 link = f'href="{a["href"]}"'

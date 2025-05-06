@@ -22,8 +22,10 @@ pip install -r requirements.txt
 pip freeze > requirements.txt
 python app.py
 
+
 taskkill /IM flask-app.exe /F
 rmdir /s /q dist
 pyinstaller --onefile app.py --name akio-local-engine
+
 
 ```
