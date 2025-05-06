@@ -70,7 +70,7 @@ def output_topic_race():
         result = exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
         exportRaceData.compress_output()
         
-        return jsonify({"data": result})
+        return jsonify({"data": result + ".zip"})
     except Exception as e:
         return jsonify({
             "error": {
