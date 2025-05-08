@@ -8,6 +8,7 @@ from services.horce_client import HorseClient
 from services.race_client import RaceClient
 from services.jockey_client import JockeyClient
 from services.base.dataset_type import DatasetType
+import time
 
 races_bp = Blueprint('races', __name__, url_prefix='/api/races')
 
@@ -41,6 +42,8 @@ def output_topic_race():
         raceClient = RaceClient()
         horseClient = HorseClient()
 
+        start = time.perf_counter()
+
         # 検証用・テスト用データ作成
 
         ## 今回出走する、競走馬の取得
@@ -70,6 +73,14 @@ def output_topic_race():
         result = exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
         exportRaceData.compress_output()
         
+        end = time.perf_counter()
+
+        elapsed_time = end - start
+
+        print("--------------------------------")
+        print(elapsed_time)
+        print("--------------------------------")
+
         return jsonify({"data": result + ".zip"})
     except Exception as e:
         return jsonify({
@@ -78,3 +89,42 @@ def output_topic_race():
                 "message": str(e)
             }
         }), 500
+    
+@races_bp.route('/calculation', methods=['POST'])
+def get_processing_time():
+    data = request.get_json()  # JSONデータを取得
+    id = data.get('id')      # 'id'キーの値（配列）を取り出す
+    executions = data.get('executions')      # 'years'キーの値（配列）を取り出す
+    start = time.perf_counter()
+    specialClient = SpecialClient()
+    raceClient = RaceClient()
+    horseClient = HorseClient()
+
+    # 検証用・テスト用データ作成
+
+    ## 今回出走する、競走馬の取得
+    race_id = specialClient.get_race_id(id)
+    test_horse_ids = raceClient.get_horse_ids(race_id)
+    horseClient.get_horses(test_horse_ids)
+
+    ## 出馬表の取得
+    raceClient.get_candidate_list(race_id)
+
+    # 学習用データ作成
+    ## 過去分のレースid取得
+    train_race_ids = specialClient.get_past_race_ids(id, 1)
+
+    ## 過去分のレース結果取得
+    train_race_results = RaceResultClient().get_race_results(train_race_ids)
+
+    ## 過去に出走した競走馬リストを取得
+    train_horse_ids = Usecase().get_horse_ids(train_race_results)
+    horseClient.get_horses(train_horse_ids)
+
+    end = time.perf_counter()
+
+    first_time = end - start
+
+    estimated_time = first_time + (executions - 1) * 21.79
+
+    return jsonify({"data": estimated_time})
