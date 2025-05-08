@@ -42,8 +42,6 @@ def output_topic_race():
         raceClient = RaceClient()
         horseClient = HorseClient()
 
-        start = time.perf_counter()
-
         # 検証用・テスト用データ作成
 
         ## 今回出走する、競走馬の取得
@@ -73,14 +71,6 @@ def output_topic_race():
         result = exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
         exportRaceData.compress_output()
         
-        end = time.perf_counter()
-
-        elapsed_time = end - start
-
-        print("--------------------------------")
-        print(elapsed_time)
-        print("--------------------------------")
-
         return jsonify({"data": result + ".zip"})
     except Exception as e:
         return jsonify({
