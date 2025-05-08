@@ -13,7 +13,6 @@ class RaceResultInfoDto:
     jockey_id: str       # 騎手ID
     time: str            # タイム
     margin: str          # 着差
-    time_index: str      # ﾀｲﾑ指数
     passing: str         # 通過
     last_3f: str         # 上り
     odds: str            # 単勝

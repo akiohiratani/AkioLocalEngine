@@ -65,7 +65,6 @@ class RaceResultClient(BaseClient):
                 jockey_id = jockey_href.split('/')[4]
                 time = cells[7].text.strip()
                 margin = cells[8].text.strip()
-                time_index = cells[9].text.strip()  # プレミアム会員でない場合は「**」等
                 passing = cells[10].text.strip()
                 last_3f = cells[11].find('span').text.strip() if cells[11].find('span') else cells[11].text.strip()
                 odds = cells[12].text.strip()
@@ -84,7 +83,6 @@ class RaceResultClient(BaseClient):
                     jockey_id=jockey_id,
                     time=time,
                     margin=margin,
-                    time_index=time_index,
                     passing=passing,
                     last_3f=last_3f,
                     odds=odds,
