@@ -58,7 +58,7 @@ class RaceClient(BaseClient):
         horse_list = []
         for tr in rows:
             # 馬番を取得
-            number_cell = tr.find('td', class_='Umaban')
+            number_cell = tr.find('td', class_=['Umaban1 Txt_C', 'Umaban2 Txt_C', 'Umaban3 Txt_C', 'Umaban4 Txt_C', 'Umaban5 Txt_C', 'Umaban6 Txt_C', 'Umaban7 Txt_C', 'Umaban8 Txt_C'])
             number = number_cell.get_text(strip=True) if number_cell else ''
             
             # 馬名を取得
