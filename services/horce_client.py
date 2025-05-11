@@ -2,6 +2,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
 from domain.horce_info import HorseInfoDTO
 from domain.race_history import RaceHistoryDto
+from domain.horse_blood import HorseBloodDto
 from services.base_client import BaseClient
 from bs4 import BeautifulSoup
 
@@ -61,11 +62,17 @@ class HorseClient(BaseClient):
             name=horse_info["name"],
             sex=horse_info["sex"],
             image=image,
-            father=blood["father"],
-            grandfather=blood["grandfather"],
+            father=blood.father,
+            grandfather=blood.grandfather,
             title=title,
             race_historys=historys
         )
+    
+    def get_blood(self, id:str)->HorseBloodDto:
+        url = self.BASE_URL.format(id)
+        soup = self.get_soup(url)
+        blood = self.get_horse_blood(soup)
+        return HorseBloodDto(father=blood.father, grandfather=blood.grandfather)
 
     def get_horse_base_info(self, soup: BeautifulSoup):
         horse_info = soup.find("div", class_="horse_title")
@@ -78,10 +85,10 @@ class HorseClient(BaseClient):
         main_photo = soup.find(id="HorseMainPhoto")
         return main_photo.get("src") if main_photo else ""
 
-    def get_horse_blood(self, soup: BeautifulSoup):
+    def get_horse_blood(self, soup: BeautifulSoup)->HorseBloodDto:
         blood_table = soup.find("table", class_="blood_table")
         horse_names = [a.text for td in blood_table.find_all("td") if (a := td.find("a"))]
-        return {"father": horse_names[0], "grandfather": horse_names[1]}
+        return HorseBloodDto(father=horse_names[0], grandfather=horse_names[1])
 
     def get_horse_title(self, soup: BeautifulSoup):
         horse_info = {}

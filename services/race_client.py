@@ -2,6 +2,7 @@ from services.base_client import BaseClient
 from typing import List
 import re
 from domain.horse import HorseDto
+from services.horce_client import HorseClient
 
 class RaceClient(BaseClient):
     # url
@@ -49,10 +50,10 @@ class RaceClient(BaseClient):
         return jockey_ids
 
     def get_candidate_list(self, id:str)->List[HorseDto]:
+        horse_clinet = HorseClient()
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
         table = soup.find("table", class_="Shutuba_Table RaceTable01 ShutubaTable")
-
         # 馬情報が含まれる行を全て取得
         rows = table.find_all('tr', class_='HorseList')        
         horse_list = []
@@ -66,11 +67,17 @@ class RaceClient(BaseClient):
             name = name_span.get_text(strip=True) if name_span else ''
 
             # 馬のId取得
+            # 血統情報を取得
             ## 失敗したら諦める
             horse_id = ""
+            father = ""
+            grandfather = ""
             try:
                 horse_href = name_span.find('a').get("href")
                 horse_id = horse_href.split('/')[4]
+                blood = horse_clinet.get_blood(horse_id)
+                father = blood.father
+                grandfather = blood.grandfather
             except:
                 print("Fail Get Horse Id")
 
@@ -109,6 +116,8 @@ class RaceClient(BaseClient):
                     horse_id=horse_id,
                     name=name, 
                     sex_age=sex_age, 
+                    father=father,
+                    grandfather=grandfather,
                     carried=carried, 
                     jockey_id=jockey_id,
                     jockey=jockey, 
