@@ -6,11 +6,11 @@ class RaceResultInfoDto:
     frame_number: str    # 枠番
     horse_number: str    # 馬番
     horse_name: str      # 馬名
-    horse_id: str        # 馬名_ID
     sex_age: str         # 性齢
+    fathder: str         # 父
+    grandfather: str     # 母父
     weight_carried: str  # 斤量
     jockey: str          # 騎手
-    jockey_id: str       # 騎手ID
     time: str            # タイム
     margin: str          # 着差
     passing: str         # 通過

@@ -59,16 +59,11 @@ def output_topic_race():
         ## 過去分のレース結果取得
         train_race_results = RaceResultClient().get_race_results(train_race_ids)
 
-        ## 過去に出走した競走馬リストを取得
-        train_horse_ids = Usecase().get_horse_ids(train_race_results)
-        train_horses = horseClient.get_horses(train_horse_ids)
-
         ## csv出力
         exportRaceData = ExportRaceData()
-        exportRaceData.export_candidate_list(candidate_list, DatasetType.TEST)
+        exportRaceData.export_candidate_list(candidate_list, DatasetType.TEST)#結合
         exportRaceData.export_horse_history(test_horse, DatasetType.TEST)
-        exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)
-        exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
+        exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)#結合
         exportRaceData.compress_output()
         result = exportRaceData.get_output_path()
         return jsonify({"data": result + ".zip"})
@@ -105,11 +100,7 @@ def get_processing_time():
     train_race_ids = specialClient.get_past_race_ids(id, 1)
 
     ## 過去分のレース結果取得
-    train_race_results = RaceResultClient().get_race_results(train_race_ids)
-
-    ## 過去に出走した競走馬リストを取得
-    train_horse_ids = Usecase().get_horse_ids(train_race_results)
-    horseClient.get_horses(train_horse_ids)
+    RaceResultClient().get_race_results(train_race_ids)
 
     end = time.perf_counter()
 

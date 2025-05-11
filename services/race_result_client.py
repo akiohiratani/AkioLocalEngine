@@ -1,5 +1,6 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from services.base_client import BaseClient
+from services.horce_client import HorseClient
 from typing import List
 import re
 from domain.race_result_info import RaceResultInfoDto
@@ -43,6 +44,7 @@ class RaceResultClient(BaseClient):
         table = soup.find("table", class_="race_table_01 nk_tb_common")
         rows = table.find_all('tr')[1:]  # ヘッダー除外
         results = []
+        horse_client = HorseClient()
         for row in rows:
             cells = row.find_all('td')
             if len(cells) < 15:
@@ -53,16 +55,16 @@ class RaceResultClient(BaseClient):
                 horse_number = cells[2].text.strip()
                 horse_name = cells[3].find('a').text.strip()
 
-                ## 馬のIDを取得
+                # 馬のIDから血統を取得
                 horse_href = cells[3].find('a').get("href")
                 horse_id = horse_href.split('/')[2]
+                blood = horse_client.get_blood(horse_id)
+                father = blood.father
+                grandfater = blood.grandfather
+
                 sex_age = cells[4].text.strip()
                 weight_carried = cells[5].text.strip()
                 jockey = cells[6].find('a').text.strip()
-
-                ## 騎手のIDを取得
-                jockey_href = cells[6].find('a').get("href")
-                jockey_id = jockey_href.split('/')[4]
                 time = cells[7].text.strip()
                 margin = cells[8].text.strip()
                 passing = cells[10].text.strip()
@@ -76,11 +78,11 @@ class RaceResultClient(BaseClient):
                     frame_number=frame_number,
                     horse_number=horse_number,
                     horse_name=horse_name,
-                    horse_id=horse_id,
                     sex_age=sex_age,
+                    fathder=father,
+                    grandfather=grandfater,
                     weight_carried=weight_carried,
                     jockey=jockey,
-                    jockey_id=jockey_id,
                     time=time,
                     margin=margin,
                     passing=passing,
