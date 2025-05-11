@@ -49,7 +49,7 @@ def output_topic_race():
         test_horse_ids = raceClient.get_horse_ids(race_id)
         test_horse = horseClient.get_horses(test_horse_ids)
 
-        ## 出馬表の取得
+        ## 出走馬情報を取得
         candidate_list = raceClient.get_candidate_list(race_id)
 
         # 学習用データ作成
@@ -59,9 +59,10 @@ def output_topic_race():
         ## 過去分のレース結果取得
         train_race_results = RaceResultClient().get_race_results(train_race_ids)
 
+        train_race_results.extend(candidate_list)
+
         ## csv出力
         exportRaceData = ExportRaceData()
-        exportRaceData.export_candidate_list(candidate_list, DatasetType.TEST)#結合
         exportRaceData.export_horse_history(test_horse, DatasetType.TEST)
         exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)#結合
         exportRaceData.compress_output()

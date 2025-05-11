@@ -1,7 +1,7 @@
 from services.base_client import BaseClient
 from typing import List
 import re
-from domain.horse import HorseDto
+from domain.race_result_info import RaceResultInfoDto
 from services.horce_client import HorseClient
 
 class RaceClient(BaseClient):
@@ -49,7 +49,7 @@ class RaceClient(BaseClient):
                 jockey_ids.append(m.group(1))
         return jockey_ids
 
-    def get_candidate_list(self, id:str)->List[HorseDto]:
+    def get_candidate_list(self, id:str):
         horse_clinet = HorseClient()
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
@@ -60,8 +60,13 @@ class RaceClient(BaseClient):
         for tr in rows:
             # 馬番を取得
             number_cell = tr.find('td', class_=['Umaban1 Txt_C', 'Umaban2 Txt_C', 'Umaban3 Txt_C', 'Umaban4 Txt_C', 'Umaban5 Txt_C', 'Umaban6 Txt_C', 'Umaban7 Txt_C', 'Umaban8 Txt_C'])
-            number = number_cell.get_text(strip=True) if number_cell else ''
+            number = number_cell.get_text(strip=True) if number_cell else '--'
             
+            # 枠番を取得
+            frame_number_cell = tr.find('td', class_=['Waku1 Txt_C', 'Waku2 Txt_C', 'Waku3 Txt_C', 'Waku4 Txt_C', 'Waku5 Txt_C', 'Waku6 Txt_C', 'Waku7 Txt_C', 'Waku8 Txt_C'])
+            frame_number_span =  frame_number_cell.find('span')
+            frame_number = frame_number_span.get_text(strip=True) if number_cell else '--'
+
             # 馬名を取得
             name_span = tr.find('span', class_='HorseName')
             name = name_span.get_text(strip=True) if name_span else ''
@@ -91,37 +96,38 @@ class RaceClient(BaseClient):
                 carried = carried_cells[0].get_text(strip=True)
             else:
                 carried = ''
+
+            # 馬体重を取得
+            horse_weight_cell = tr.find_all('td', class_='Weight')
+            if horse_weight_cell:
+                horse_weight = horse_weight_cell[0].get_text(strip=True)
+            else:
+                horse_weight = '--'
             
             # 騎手を取得
             jockey_cell = tr.find('td', class_='Jockey')
             jockey = jockey_cell.get_text(strip=True) if jockey_cell else ''
 
-            # 騎手のId取得
-            ## 失敗したら諦める
-            jockey_id = ""
-            try:
-                jockey_href = jockey_cell.find('a').get("href")
-                jockey_id = jockey_href.split('/')[6]
-            except:
-                print("Fail Get Jocekey Id")
-
-            # 調教師を取得
-            trainer_cell = tr.find('td', class_='Trainer')
-            trainer = trainer_cell.get_text(strip=True) if trainer_cell else ''
-            
             # DTOを作成してリストに追加
             horse_list.append(
-                HorseDto(
-                    number=number,
-                    horse_id=horse_id,
-                    name=name, 
-                    sex_age=sex_age, 
-                    father=father,
+                RaceResultInfoDto(
+                    type="未来",
+                    rank="--",
+                    frame_number=frame_number,
+                    horse_number=number,
+                    horse_name=name,
+                    sex_age=sex_age,
+                    fathder=father,
                     grandfather=grandfather,
-                    carried=carried, 
-                    jockey_id=jockey_id,
-                    jockey=jockey, 
-                    trainer=trainer
+                    weight_carried=carried,
+                    jockey=jockey,
+                    time="--",
+                    margin="--",
+                    passing="--",
+                    last_3f="--",
+                    odds="--",
+                    popularity="--",
+                    horse_weight=horse_weight
                 )
             )
         

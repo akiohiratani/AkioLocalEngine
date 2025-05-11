@@ -1,25 +1,16 @@
-import os
-import zipfile
-import shutil
 import pandas as pd
-import numpy as np
-import datetime
-from pathlib import Path
 from dataclasses import asdict
 from typing import List
 from services.base.base_export import ExportBase
 from domain.horce_info import HorseInfoDTO
-from domain.horse import HorseDto
 from services.base.dataset_type import DatasetType
-
-# 馬情報クラスのインポート（添付ファイルから）
-from domain.race_history import RaceHistoryDto
+from domain.race_result_info import RaceResultInfoDto
 
 class ExportRaceData(ExportBase):
     def __init__(self):
         super().__init__()
 
-    def export_past_race_data_to_csv(self, race_results: List[RaceHistoryDto], type:DatasetType) -> str:
+    def export_past_race_data_to_csv(self, race_results: List[RaceResultInfoDto], type:DatasetType) -> str:
         """
         レース結果データをCSVファイルとして出力する関数
         
@@ -28,7 +19,7 @@ class ExportRaceData(ExportBase):
         race_df = pd.DataFrame([asdict(result) for result in race_results])
         race_df.to_csv(f"{self.output_dir}/{type}_dataset_race.csv", index=False, encoding="utf-8-sig")
 
-        return 
+        return
     
     def export_horse_history(self, horse_list: List[HorseInfoDTO], type: DatasetType):
         """競走馬のレース履歴詳細のCSV出力"""
@@ -55,11 +46,4 @@ class ExportRaceData(ExportBase):
         race_df = race_df[cols]
         race_df.to_csv(f"{self.output_dir}/{type}_dataset_horse.csv", index=False, encoding="utf-8-sig")
 
-        return 
-    
-    def export_candidate_list(self, horse_list: List[HorseDto], type: DatasetType):
-        """出馬表のCSV出力"""
-        race_df = pd.DataFrame([asdict(result) for result in horse_list])
-        race_df.to_csv(f"{self.output_dir}/{type}_dataset_candidate_list.csv", index=False, encoding="utf-8-sig")
-
-        return 
+        return

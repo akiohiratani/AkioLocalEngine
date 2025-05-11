@@ -74,6 +74,7 @@ class RaceResultClient(BaseClient):
                 horse_weight = cells[14].text.strip()
 
                 result = RaceResultInfoDto(
+                    type="過去",
                     rank=rank,
                     frame_number=frame_number,
                     horse_number=horse_number,

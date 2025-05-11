@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class RaceResultInfoDto:
+    type: str            # 過去/未来
     rank: str            # 着順
     frame_number: str    # 枠番
     horse_number: str    # 馬番
