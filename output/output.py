@@ -50,3 +50,13 @@ class Output:
                 f.write(f"Div {i}:\n")
                 f.write(div.prettify())
                 f.write('\n' + '-'*40 + '\n')
+
+    # dl要素をクラス指定して全て出力するメソッド
+    def outputDlForClass(self, soup:BeautifulSoup, class_name:str):
+        # table要素を全て取得
+        tables = soup.find_all('dl', class_=class_name)
+        with open('output/dls.txt', 'w', encoding='utf-8') as f:
+            for i, table in enumerate(tables, 1):
+                f.write(f"dl {i}:\n")
+                f.write(table.prettify())
+                f.write('\n' + '-'*40 + '\n')

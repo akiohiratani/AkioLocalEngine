@@ -20,3 +20,6 @@ class RaceResultInfoDto:
     odds: str            # 単勝
     popularity: str      # 人気
     horse_weight: str    # 馬体重
+    distance: str        # 距離
+    weather: str         # 天気
+    track_condition: str    # 馬場状態

@@ -128,7 +128,10 @@ class RaceClient(BaseClient):
                     last_3f="",
                     odds="",
                     popularity="",
-                    horse_weight=horse_weight
+                    horse_weight=horse_weight,
+                    distance="",
+                    weather="",
+                    track_condition="",
                 )
             )
         
