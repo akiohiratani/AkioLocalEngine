@@ -6,6 +6,7 @@ class RaceResultInfoDto:
     rank: str            # 着順
     frame_number: str    # 枠番
     horse_number: str    # 馬番
+    horse_id: str        # 馬ID
     horse_name: str      # 馬名
     sex_age: str         # 性齢
     fathder: str         # 父

@@ -49,7 +49,7 @@ class RaceClient(BaseClient):
                 jockey_ids.append(m.group(1))
         return jockey_ids
 
-    def get_candidate_list(self, id:str):
+    def get_candidate_list(self, id:str)->List[RaceResultInfoDto]:
         horse_clinet = HorseClient()
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
@@ -112,21 +112,22 @@ class RaceClient(BaseClient):
             horse_list.append(
                 RaceResultInfoDto(
                     type="未来",
-                    rank="--",
+                    rank="",
                     frame_number=frame_number,
                     horse_number=number,
+                    horse_id=horse_id,
                     horse_name=name,
                     sex_age=sex_age,
                     fathder=father,
                     grandfather=grandfather,
                     weight_carried=carried,
                     jockey=jockey,
-                    time="--",
-                    margin="--",
-                    passing="--",
-                    last_3f="--",
-                    odds="--",
-                    popularity="--",
+                    time="",
+                    margin="",
+                    passing="",
+                    last_3f="",
+                    odds="",
+                    popularity="",
                     horse_weight=horse_weight
                 )
             )

@@ -2,8 +2,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from services.base_client import BaseClient
 from services.horce_client import HorseClient
 from typing import List
-import re
 from domain.race_result_info import RaceResultInfoDto
+from output.output import Output
 
 class RaceResultClient(BaseClient):
     # url
@@ -41,6 +41,7 @@ class RaceResultClient(BaseClient):
     def get_race_result(self, id:str)->List[RaceResultInfoDto]:
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
+        Output().outputTableForClass(soup, class_name="race_table_01 nk_tb_common")
         table = soup.find("table", class_="race_table_01 nk_tb_common")
         rows = table.find_all('tr')[1:]  # ヘッダー除外
         results = []
@@ -78,6 +79,7 @@ class RaceResultClient(BaseClient):
                     rank=rank,
                     frame_number=frame_number,
                     horse_number=horse_number,
+                    horse_id=horse_id,
                     horse_name=horse_name,
                     sex_age=sex_age,
                     fathder=father,
