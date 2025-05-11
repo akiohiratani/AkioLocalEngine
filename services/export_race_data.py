@@ -28,7 +28,7 @@ class ExportRaceData(ExportBase):
         race_df = pd.DataFrame([asdict(result) for result in race_results])
         race_df.to_csv(f"{self.output_dir}/{type}_dataset_race.csv", index=False, encoding="utf-8-sig")
 
-        return self.output_path
+        return 
     
     def export_horse_history(self, horse_list: List[HorseInfoDTO], type: DatasetType):
         """競走馬のレース履歴詳細のCSV出力"""
@@ -55,11 +55,11 @@ class ExportRaceData(ExportBase):
         race_df = race_df[cols]
         race_df.to_csv(f"{self.output_dir}/{type}_dataset_horse.csv", index=False, encoding="utf-8-sig")
 
-        return self.output_path
+        return 
     
     def export_candidate_list(self, horse_list: List[HorseDto], type: DatasetType):
         """出馬表のCSV出力"""
         race_df = pd.DataFrame([asdict(result) for result in horse_list])
         race_df.to_csv(f"{self.output_dir}/{type}_dataset_candidate_list.csv", index=False, encoding="utf-8-sig")
 
-        return self.output_path
+        return 

@@ -28,9 +28,9 @@ class SpecialClient(BaseClient):
     def get_past_race_ids(self, id:str, max_results)->List[str]:
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
-        soup.find("table", id = "All_Special_Table")
+        table = soup.find("table", id = "All_Special_Table")
         race_ids = []
-        for tr in soup.find_all('tr')[1:max_results+1]:
+        for tr in table.find_all('tr')[1:max_results+1]:
             a = tr.find('a', href=True)
             if a and '/race/' in a['href']:
                 link = f'href="{a["href"]}"'

@@ -65,12 +65,12 @@ def output_topic_race():
 
         ## csv出力
         exportRaceData = ExportRaceData()
-        result = exportRaceData.export_candidate_list(candidate_list, DatasetType.TEST)
-        result = exportRaceData.export_horse_history(test_horse, DatasetType.TEST)
-        result = exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)
-        result = exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
+        exportRaceData.export_candidate_list(candidate_list, DatasetType.TEST)
+        exportRaceData.export_horse_history(test_horse, DatasetType.TEST)
+        exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)
+        exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
         exportRaceData.compress_output()
-        
+        result = exportRaceData.get_output_path()
         return jsonify({"data": result + ".zip"})
     except Exception as e:
         return jsonify({

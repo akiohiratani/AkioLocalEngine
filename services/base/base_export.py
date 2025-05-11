@@ -30,3 +30,5 @@ class ExportBase:
 
         # 圧縮が終わったら元フォルダを削除
         shutil.rmtree(self.output_dir)
+    def get_output_path(self):
+        return self.output_path
