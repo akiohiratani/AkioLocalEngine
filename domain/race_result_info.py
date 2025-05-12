@@ -3,11 +3,13 @@ from dataclasses import dataclass
 @dataclass
 class RaceResultInfoDto:
     type: str            # 過去/未来
+    date:str             # 日付
     rank: str            # 着順
     frame_number: str    # 枠番
     horse_number: str    # 馬番
     horse_id: str        # 馬ID
     horse_name: str      # 馬名
+    horse_link: str      # 馬Link
     sex_age: str         # 性齢
     fathder: str         # 父
     grandfather: str     # 母父
@@ -20,6 +22,7 @@ class RaceResultInfoDto:
     odds: str            # 単勝
     popularity: str      # 人気
     horse_weight: str    # 馬体重
+    location: str        # 開催
     distance: str        # 距離
     weather: str         # 天気
-    track_condition: str    # 馬場状態
+    track_condition: str # 馬場状態

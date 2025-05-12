@@ -64,7 +64,7 @@ def output_topic_race():
         ## csv出力
         exportRaceData = ExportRaceData()
         exportRaceData.export_past_race_data_to_csv(f'{name}_{years}年文の分析データ', train_race_results)
-        exportRaceData.export_horse_history(f'{name}_に出走する馬の戦歴データ', candidate_horses)
+        exportRaceData.export_horse_history(f'{name}_出走する馬の戦歴データ', candidate_horses)
         result = exportRaceData.get_output_path()
         return jsonify({"data": result})
     except Exception as e:
@@ -84,20 +84,24 @@ def get_processing_time():
     specialClient = SpecialClient()
     raceClient = RaceClient()
 
-    # 検証用・テスト用データ作成
-
     ## 今回出走する、競走馬の取得
     race_id = specialClient.get_race_id(id)
 
-    ## 出馬表の取得
-    raceClient.get_candidate_list(race_id)
+    ## 出走馬情報を取得
+    candidate_list = raceClient.get_candidate_list(race_id)
+
+    ## 出走馬のID取得
+    candidate_horse_ids = [candidate.horse_id for candidate in candidate_list]
+    HorseClient().get_horses(candidate_horse_ids)
 
     # 学習用データ作成
     ## 過去分のレースid取得
     train_race_ids = specialClient.get_past_race_ids(id, 1)
 
     ## 過去分のレース結果取得
-    RaceResultClient().get_race_results(train_race_ids)
+    train_race_results = RaceResultClient().get_race_results(train_race_ids)
+
+    train_race_results.extend(candidate_list)
 
     end = time.perf_counter()
 

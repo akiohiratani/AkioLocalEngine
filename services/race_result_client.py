@@ -3,8 +3,8 @@ from services.base_client import BaseClient
 from services.horce_client import HorseClient
 from typing import List
 from domain.race_result_info import RaceResultInfoDto
-from output.output import Output
-from bs4 import BeautifulSoup
+from services.usecase import Usecase
+import re
 
 class RaceResultClient(BaseClient):
     # url
@@ -43,6 +43,16 @@ class RaceResultClient(BaseClient):
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
 
+        # 日付を取得
+        date = ""
+        p_smalltxt = soup.find("p", class_="smalltxt")
+        if p_smalltxt:
+            # 正規表現で日付パターンを抽出
+            text = p_smalltxt.get_text(strip=True)
+            date_pattern = re.search(r'\d{4}年\d{1,2}月\d{1,2}日', text)
+            if date_pattern:
+                date = date_pattern.group(0)
+
         # レース条件の取得
         dl = soup.find("dl", class_="racedata fc")
         span = dl.find('span')
@@ -70,6 +80,9 @@ class RaceResultClient(BaseClient):
             
             # 3. "芝 : 良" → "良" （「芝 : 」を削除）
             track_condition = turf_condition.split(':')[-1].strip()
+        
+        # 開催場所
+        location = Usecase().get_racecourse_robust(id)
             
         # 結果一覧の取得
         table = soup.find("table", class_="race_table_01 nk_tb_common")
@@ -106,11 +119,13 @@ class RaceResultClient(BaseClient):
 
                 result = RaceResultInfoDto(
                     type="過去",
+                    date=date,
                     rank=rank,
                     frame_number=frame_number,
                     horse_number=horse_number,
                     horse_id=horse_id,
                     horse_name=horse_name,
+                    horse_link=f"https://db.netkeiba.com/horse/{horse_id}",
                     sex_age=sex_age,
                     fathder=father,
                     grandfather=grandfater,
@@ -123,6 +138,7 @@ class RaceResultClient(BaseClient):
                     odds=odds,
                     popularity=popularity,
                     horse_weight=horse_weight,
+                    location=location,
                     distance=distance,
                     weather=weather,
                     track_condition=track_condition

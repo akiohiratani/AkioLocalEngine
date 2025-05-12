@@ -5,6 +5,7 @@ from domain.race_history import RaceHistoryDto
 from domain.horse_blood import HorseBloodDto
 from services.base_client import BaseClient
 from bs4 import BeautifulSoup
+import re
 
 class HorseClient(BaseClient):
     BASE_URL = "https://db.netkeiba.com/horse/{}"
@@ -60,6 +61,7 @@ class HorseClient(BaseClient):
         return HorseInfoDTO(
             id=id,
             name=horse_info["name"],
+            link=f"https://db.netkeiba.com/horse/{id}",
             sex=horse_info["sex"],
             image=image,
             father=blood.father,
@@ -113,7 +115,8 @@ class HorseClient(BaseClient):
 
                 # 主要データの抽出
                 date = cells[0].text.strip()
-                venue = cells[1].text.strip()
+                venue_text = cells[1].text.strip()
+                venue = re.sub(r'[0-9]', '', venue_text)
                 race_name = cells[4].text.strip()
                 weather=cells[2].text.strip()
                 race_number=cells[3].text.strip()

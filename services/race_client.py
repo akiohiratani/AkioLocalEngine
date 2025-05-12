@@ -3,6 +3,7 @@ from typing import List
 import re
 from domain.race_result_info import RaceResultInfoDto
 from services.horce_client import HorseClient
+from services.usecase import Usecase
 
 class RaceClient(BaseClient):
     # url
@@ -53,23 +54,57 @@ class RaceClient(BaseClient):
         horse_clinet = HorseClient()
         url = self.BASE_URL.format(id)
         soup = self.get_soup(url)
+
+        # レースの基本情報を取得
+        base_race_info = soup.find("div", class_="RaceData01")
+
+        ## 1. 距離情報: 芝1600m の取得
+        distance = ""
+        distance_span = base_race_info.find('span')
+        if distance_span:
+            distance = distance_span.get_text(strip=True)
+
+        ## 2. 天気情報: 晴 の取得
+        # div全体のテキストを取得
+        weather = ""
+        full_text = distance_span.get_text()
+        weather_match = re.search(r'天候:([^/]+)', full_text)
+        if weather_match:
+            weather = weather_match.group(1).strip()
+
+        # 3. 馬場状態: 良 の取得
+        track_condition = ""
+        track_match = re.search(r'馬場:([^/]+)', full_text)
+        if track_match:
+            track_condition = track_match.group(1).strip()
+
+        # 開催場所を取得
+        location = Usecase().get_racecourse_robust(id)
+
+        ## 出走馬の情報を取得
         table = soup.find("table", class_="Shutuba_Table RaceTable01 ShutubaTable")
         # 馬情報が含まれる行を全て取得
         rows = table.find_all('tr', class_='HorseList')        
         horse_list = []
         for tr in rows:
             # 馬番を取得
+            number = ""
             number_cell = tr.find('td', class_=['Umaban1 Txt_C', 'Umaban2 Txt_C', 'Umaban3 Txt_C', 'Umaban4 Txt_C', 'Umaban5 Txt_C', 'Umaban6 Txt_C', 'Umaban7 Txt_C', 'Umaban8 Txt_C'])
-            number = number_cell.get_text(strip=True) if number_cell else '--'
+            if number_cell:
+                number = number_cell.get_text(strip=True) if number_cell else '--'
             
             # 枠番を取得
+            frame_number = ""
             frame_number_cell = tr.find('td', class_=['Waku1 Txt_C', 'Waku2 Txt_C', 'Waku3 Txt_C', 'Waku4 Txt_C', 'Waku5 Txt_C', 'Waku6 Txt_C', 'Waku7 Txt_C', 'Waku8 Txt_C'])
-            frame_number_span =  frame_number_cell.find('span')
-            frame_number = frame_number_span.get_text(strip=True) if number_cell else '--'
+            if frame_number_cell:
+                frame_number_span =  frame_number_cell.find('span')
+                frame_number = frame_number_span.get_text(strip=True) if number_cell else '--'
 
             # 馬名を取得
+            name = ""
             name_span = tr.find('span', class_='HorseName')
-            name = name_span.get_text(strip=True) if name_span else ''
+            if name_span:
+                name = name_span.get_text(strip=True) if name_span else ''
 
             # 馬のId取得
             # 血統情報を取得
@@ -87,15 +122,16 @@ class RaceClient(BaseClient):
                 print("Fail Get Horse Id")
 
             # 性齢を取得
+            sex_age = ""
             sex_age_cell = tr.find('td', class_='Barei')
-            sex_age = sex_age_cell.get_text(strip=True) if sex_age_cell else ''
+            if sex_age_cell:
+                sex_age = sex_age_cell.get_text(strip=True) if sex_age_cell else ''
             
             # 斤量を取得
+            carried = ""
             carried_cells = tr.find_all('td', class_='Txt_C')
             if carried_cells:
                 carried = carried_cells[0].get_text(strip=True)
-            else:
-                carried = ''
 
             # 馬体重を取得
             horse_weight_cell = tr.find_all('td', class_='Weight')
@@ -105,18 +141,22 @@ class RaceClient(BaseClient):
                 horse_weight = '--'
             
             # 騎手を取得
+            jockey = ""
             jockey_cell = tr.find('td', class_='Jockey')
-            jockey = jockey_cell.get_text(strip=True) if jockey_cell else ''
+            if jockey_cell:
+                jockey = jockey_cell.get_text(strip=True) if jockey_cell else ''
 
             # DTOを作成してリストに追加
             horse_list.append(
                 RaceResultInfoDto(
                     type="未来",
+                    date="",
                     rank="",
                     frame_number=frame_number,
                     horse_number=number,
                     horse_id=horse_id,
                     horse_name=name,
+                    horse_link=f"https://db.netkeiba.com/horse/{horse_id}",
                     sex_age=sex_age,
                     fathder=father,
                     grandfather=grandfather,
@@ -129,9 +169,10 @@ class RaceClient(BaseClient):
                     odds="",
                     popularity="",
                     horse_weight=horse_weight,
-                    distance="",
-                    weather="",
-                    track_condition="",
+                    location=location,
+                    distance=distance,
+                    weather=weather,
+                    track_condition=track_condition,
                 )
             )
         

@@ -6,6 +6,7 @@ from domain.race_history import RaceHistoryDto
 class HorseInfoDTO:
     id: str
     name: str
+    link:str
     sex: str
     image: str
     father: str

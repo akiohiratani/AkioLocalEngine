@@ -20,10 +20,13 @@ class ExportRaceData(ExportBase):
 
         column_mapping = {
             'type':'データ種別',
+            'date':'日付',
             'rank':'着順',
             'frame_number' : '枠番',
             'horse_number' : '馬番',
+            'horse_id': '馬ID',
             'horse_name': '馬名',
+            'horse_link': '馬リンク',
             'sex_age': '性齢',
             'fathder': '父',
             'grandfather': '母父',
@@ -35,7 +38,11 @@ class ExportRaceData(ExportBase):
             'last_3f' : "上がり3F",
             'odds' : 'オッズ',
             'popularity' : '人気',
-            'horse_weight' : '馬体重'
+            'horse_weight' : '馬体重',
+            'location' : '開催場所',
+            'distance' : '距離',
+            'weather' : '天気',
+            'track_condition' : '馬場状態',
         }
         race_df.rename(columns=column_mapping, inplace=True)
 
@@ -64,6 +71,7 @@ class ExportRaceData(ExportBase):
                 race_dict = {
                     "horse_id": horse.id,
                     "horse_name": horse.name,
+                    "horse_link": horse.link,
                     "horse_sex": horse.sex,
                     "horse_father": horse.father,
                     "horse_grandfather": horse.grandfather,
@@ -73,17 +81,19 @@ class ExportRaceData(ExportBase):
         race_df = pd.DataFrame(race_records)
         # カラム順を明示的に指定（必要に応じて調整）
         cols = [
-            "horse_id", "horse_name", "horse_sex", "horse_father", "horse_grandfather"
-        ] + [c for c in race_df.columns if c not in ("horse_id", "horse_name", "horse_sex", "horse_father", "horse_grandfather")]
+            "horse_id", "horse_name", "horse_link", "horse_sex", "horse_father", "horse_grandfather"
+        ] + [c for c in race_df.columns if c not in ("horse_id", "horse_name", "horse_link", "horse_sex", "horse_father", "horse_grandfather")]
         race_df = race_df[cols]
 
         column_mapping = {
+            'horse_id': '馬ID',
             'horse_name': '馬名',
+            'horse_link': '馬リンク',
             'horse_sex': '性齢',
             'horse_father': '父',
             'horse_grandfather': '母父',
             'date': '日付',
-            'venue': '開催',
+            'venue': '開催場所',
             'weather': '天気',
             'race_number': 'レース番号',
             'race_name' : 'レース名',
