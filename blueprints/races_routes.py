@@ -34,6 +34,10 @@ def get_topic_race():
 def output_topic_race():
     ## http://127.0.0.1:5000/api/races/data
     try:
+        start = time.perf_counter()
+        
+
+
         data = request.get_json()  # JSONデータを取得
         id = data.get('id')      # 'id'キーの値（配列）を取り出す
         years = data.get('years')      # 'years'キーの値（配列）を取り出す
@@ -61,6 +65,12 @@ def output_topic_race():
 
         train_race_results.extend(candidate_list)
 
+        end = time.perf_counter()
+        first_time = end - start
+        print("---かかった時間---")
+        print(first_time)
+        print("-----------------")
+
         ## csv出力
         exportRaceData = ExportRaceData()
         exportRaceData.export_past_race_data_to_csv(f'{name}_{years}年文の分析データ', train_race_results)
@@ -80,7 +90,7 @@ def get_processing_time():
     data = request.get_json()  # JSONデータを取得
     id = data.get('id')      # 'id'キーの値（配列）を取り出す
     executions = data.get('executions')      # 'years'キーの値（配列）を取り出す
-    start = time.perf_counter()
+    # start = time.perf_counter()
     specialClient = SpecialClient()
     raceClient = RaceClient()
 
@@ -103,10 +113,12 @@ def get_processing_time():
 
     train_race_results.extend(candidate_list)
 
-    end = time.perf_counter()
+    # end = time.perf_counter()
 
-    first_time = end - start
-    print(first_time)
-    estimated_time = first_time + (executions - 1) * 21.79
+    # first_time = end - start
+    # print("---初期開始時間---")
+    # print(first_time)
+    # print("-----------------")
+    estimated_time = first_time + (executions - 1) * 2.0
 
     return jsonify({"data": estimated_time})
