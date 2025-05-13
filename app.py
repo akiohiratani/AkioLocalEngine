@@ -29,11 +29,11 @@ def get_status():
                     "message": "Expired"
                 }
             }), 500
-    except:
+    except Exception as e:
         return jsonify({
             "error": {
                 "code": "INTERNAL_SERVER_ERROR",
-                "message": "Expired"
+                "message": str(e)
             }
         }), 500
 # flask-backend/app.py 追記
