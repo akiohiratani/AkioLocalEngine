@@ -6,8 +6,6 @@ from services.race_result_client import RaceResultClient
 from services.export_race_data import ExportRaceData
 from services.horce_client import HorseClient
 from services.race_client import RaceClient
-from services.jockey_client import JockeyClient
-from services.base.dataset_type import DatasetType
 import time
 
 races_bp = Blueprint('races', __name__, url_prefix='/api/races')
