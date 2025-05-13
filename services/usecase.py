@@ -58,3 +58,15 @@ class Usecase:
         
         except Exception as e:
             return ""
+    def get_activate(self):
+        # 今日の日付を取得
+        today = datetime.date.today()
+        
+        # 今年の09月30日を作成
+        this_year = today.year
+        october_first = datetime.date(this_year, 9, 30)
+        
+        # 今日が09月30日以前かどうかを判定
+        is_activate = today <= october_first
+        
+        return is_activate
