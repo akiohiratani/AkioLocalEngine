@@ -1,0 +1,35 @@
+name: macOS Build
+
+on:
+  workflow_dispatch:  # まずは手動実行のみに設定
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.13'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Build application
+      run: |
+        pyinstaller --onefile app.py --name akio-local-engine
+    
+    - name: List files in dist directory
+      run: ls -la dist/
+      
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: akio-local-engine-mac
+        path: dist/akio-local-engine
