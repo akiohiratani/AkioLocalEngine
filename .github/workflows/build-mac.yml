@@ -2,8 +2,8 @@ name: Build macOS Application
 
 on:
   push:
-    branches: [ develop/v1_mac_os ]
-  workflow_dispatch: 
+    branches: [ develop/v1_mac ]
+  workflow_dispatch:
 
 jobs:
   build-macos:
@@ -13,7 +13,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Set up Python 3.13
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4  # v5からv4に変更
       with:
         python-version: '3.13'
         
@@ -28,7 +28,7 @@ jobs:
         pyinstaller --onefile app.py --name akio-local-engine
         
     - name: Upload macOS Application
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v2  # v3からv2に変更
       with:
         name: akio-local-engine-macos
         path: ./dist/akio-local-engine
