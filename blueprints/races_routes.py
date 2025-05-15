@@ -110,3 +110,47 @@ def get_processing_time():
     estimated_time = first_time + (executions - 1) * 2.0
 
     return jsonify({"data": estimated_time})
+
+@races_bp.route('/muratacup', methods=['GET'])
+def test():
+    ## http://127.0.0.1:5000/api/races/muratacup
+    try:
+        id = "0056"      # 'id'キーの値（配列）を取り出す
+        years = 1      # 'years'キーの値（配列）を取り出す
+        name = "TEST"      # 'years'キーの値（配列）を取り出す
+
+        specialClient = SpecialClient()
+        raceClient = RaceClient()
+
+        ## 今回出走する、競走馬の取得
+        race_id = specialClient.get_race_id(id)
+
+        ## 出走馬情報を取得
+        candidate_list = raceClient.get_candidate_list(race_id)
+
+        ## 出走馬のID取得
+        candidate_horse_ids = [candidate.horse_id for candidate in candidate_list]
+        candidate_horses = HorseClient().get_horses(candidate_horse_ids)
+
+        # 学習用データ作成
+        ## 過去分のレースid取得
+        train_race_ids = specialClient.get_past_race_ids(id, years)
+
+        ## 過去分のレース結果取得
+        train_race_results = RaceResultClient().get_race_results(train_race_ids)
+
+        train_race_results.extend(candidate_list)
+
+        ## csv出力
+        exportRaceData = ExportRaceData()
+        exportRaceData.export_past_race_data_to_csv(f'{name}_{years}年文の分析データ', train_race_results)
+        exportRaceData.export_horse_history(f'{name}_出走する馬の戦歴データ', candidate_horses)
+        result = exportRaceData.get_output_path()
+        return jsonify({"data": result})
+    except Exception as e:
+        return jsonify({
+            "error": {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": str(e)
+            }
+        }), 500
