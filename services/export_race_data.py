@@ -34,7 +34,7 @@ class ExportRaceData(ExportBase):
             'jockey' : '騎手',
             'time' : 'タイム',
             'margin' : '着差',
-            'passing' : 'ペース',
+            'passing' : '通過',
             'last_3f' : "上がり3F",
             'odds' : 'オッズ',
             'popularity' : '人気',
@@ -47,7 +47,7 @@ class ExportRaceData(ExportBase):
         race_df.rename(columns=column_mapping, inplace=True)
 
         # 日付として解釈されやすい列のリスト
-        date_like_columns = ['ペース', '着差', '通過']
+        date_like_columns = ['着差', '通過']
         
         # これらの列に対して処理を行う
         for col in date_like_columns:
@@ -55,7 +55,7 @@ class ExportRaceData(ExportBase):
                 # NaN値を処理
                 race_df[col] = race_df[col].fillna('')
                 # 文字列に変換して先頭にタブを付ける
-                race_df[col] = "'" + race_df[col].astype(str)
+                race_df[col] = "\'" + race_df[col].astype(str) + "\'"
 
         race_df.to_csv(f"{self.output_dir}/{file_name}.csv", index=False, encoding="utf-8-sig")
         return
