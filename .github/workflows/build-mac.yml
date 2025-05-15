@@ -10,25 +10,25 @@ jobs:
     runs-on: macos-latest
     
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v2
     
-    - name: Set up Python 3.13
-      uses: actions/setup-python@v4  # v5からv4に変更
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python-version: '3.13'
+        python-version: '3.13'  # requirements.txtの依存関係に基づく
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        pip install pyinstaller
         
     - name: Build with PyInstaller
       run: |
+        # PyInstallerはrequirements.txtに含まれているのでインストール不要
         pyinstaller --onefile app.py --name akio-local-engine
         
     - name: Upload macOS Application
-      uses: actions/upload-artifact@v2  # v3からv2に変更
+      uses: actions/upload-artifact@v2  # バージョンをv2に変更
       with:
         name: akio-local-engine-macos
         path: ./dist/akio-local-engine
