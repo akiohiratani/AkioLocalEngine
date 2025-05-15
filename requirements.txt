@@ -18,7 +18,7 @@ packaging==25.0
 pandas==2.2.3
 pefile==2023.2.7
 pyinstaller==6.13.0
-pyinstaller-hooks-contrib>=2025.2  # 更新
+pyinstaller-hooks-contrib>=2025.2
 python-dateutil==2.9.0
 pytz==2025.2
 pywin32-ctypes==0.2.3
@@ -29,4 +29,4 @@ soupsieve==2.7
 typing_extensions==4.13.2
 tzdata==2025.2
 urllib3==2.4.0
-Werkzeug>=3
+Werkzeug>=3.1
