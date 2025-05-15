@@ -17,13 +17,19 @@
 ```
 cd flask-backend 
 python -m venv venv
+py -3.12 -m venv venv312
+
 venv\Scripts\activate
+venv312\Scripts\activate
+
 pip install -r requirements.txt
 pip freeze > requirements.txt
 python app.py
 
+
 taskkill /IM flask-app.exe /F
 rmdir /s /q dist
 pyinstaller --onefile app.py --name akio-local-engine
+
 
 ```

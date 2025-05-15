@@ -6,6 +6,8 @@ class HorseDto:
     horse_id:str
     name:str
     sex_age:str
+    father:str
+    grandfather:str
     carried:str
     jockey_id:str
     jockey:str

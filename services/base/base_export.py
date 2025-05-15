@@ -1,12 +1,9 @@
 import os
 import zipfile
 import shutil
-import pandas as pd
-import numpy as np
 import datetime
 from pathlib import Path
-from dataclasses import asdict
-from typing import List
+import tempfile
 
 class ExportBase:
     def __init__(self):
@@ -14,8 +11,9 @@ class ExportBase:
         date_str = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         folder_name = date_str + "_HorseInfomainon"
         # ダウウンロード先のパス確定
-        user_folder = os.path.expanduser("~")
-        download_folder = os.path.join(user_folder, "Downloads")
+        # どちらのOSにも対応できるようにテンポラリーフォルダにする
+        temp_folder = tempfile.gettempdir()
+        download_folder = os.path.join(temp_folder, "AKIO_SCRAPER")
         self.output_path = os.path.join(download_folder, folder_name)
         out_dir = Path(self.output_path)
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -30,3 +28,5 @@ class ExportBase:
 
         # 圧縮が終わったら元フォルダを削除
         shutil.rmtree(self.output_dir)
+    def get_output_path(self):
+        return self.output_path

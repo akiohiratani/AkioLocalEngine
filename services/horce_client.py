@@ -2,8 +2,10 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List
 from domain.horce_info import HorseInfoDTO
 from domain.race_history import RaceHistoryDto
+from domain.horse_blood import HorseBloodDto
 from services.base_client import BaseClient
 from bs4 import BeautifulSoup
+import re
 
 class HorseClient(BaseClient):
     BASE_URL = "https://db.netkeiba.com/horse/{}"
@@ -59,13 +61,20 @@ class HorseClient(BaseClient):
         return HorseInfoDTO(
             id=id,
             name=horse_info["name"],
+            link=f"https://db.netkeiba.com/horse/{id}",
             sex=horse_info["sex"],
             image=image,
-            father=blood["father"],
-            grandfather=blood["grandfather"],
+            father=blood.father,
+            grandfather=blood.grandfather,
             title=title,
             race_historys=historys
         )
+    
+    def get_blood(self, id:str)->HorseBloodDto:
+        url = self.BASE_URL.format(id)
+        soup = self.get_soup(url)
+        blood = self.get_horse_blood(soup)
+        return HorseBloodDto(father=blood.father, grandfather=blood.grandfather)
 
     def get_horse_base_info(self, soup: BeautifulSoup):
         horse_info = soup.find("div", class_="horse_title")
@@ -78,10 +87,10 @@ class HorseClient(BaseClient):
         main_photo = soup.find(id="HorseMainPhoto")
         return main_photo.get("src") if main_photo else ""
 
-    def get_horse_blood(self, soup: BeautifulSoup):
+    def get_horse_blood(self, soup: BeautifulSoup)->HorseBloodDto:
         blood_table = soup.find("table", class_="blood_table")
         horse_names = [a.text for td in blood_table.find_all("td") if (a := td.find("a"))]
-        return {"father": horse_names[0], "grandfather": horse_names[1]}
+        return HorseBloodDto(father=horse_names[0], grandfather=horse_names[1])
 
     def get_horse_title(self, soup: BeautifulSoup):
         horse_info = {}
@@ -106,7 +115,8 @@ class HorseClient(BaseClient):
 
                 # 主要データの抽出
                 date = cells[0].text.strip()
-                venue = cells[1].text.strip()
+                venue_text = cells[1].text.strip()
+                venue = re.sub(r'[0-9]', '', venue_text)
                 race_name = cells[4].text.strip()
                 weather=cells[2].text.strip()
                 race_number=cells[3].text.strip()

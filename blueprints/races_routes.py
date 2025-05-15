@@ -6,8 +6,7 @@ from services.race_result_client import RaceResultClient
 from services.export_race_data import ExportRaceData
 from services.horce_client import HorseClient
 from services.race_client import RaceClient
-from services.jockey_client import JockeyClient
-from services.base.dataset_type import DatasetType
+import time
 
 races_bp = Blueprint('races', __name__, url_prefix='/api/races')
 
@@ -35,40 +34,36 @@ def output_topic_race():
     try:
         data = request.get_json()  # JSONデータを取得
         id = data.get('id')      # 'id'キーの値（配列）を取り出す
+        years = data.get('years')      # 'years'キーの値（配列）を取り出す
+        name = data.get('name')      # 'years'キーの値（配列）を取り出す
 
         specialClient = SpecialClient()
         raceClient = RaceClient()
-        horseClient = HorseClient()
-
-        # 検証用・テスト用データ作成
 
         ## 今回出走する、競走馬の取得
         race_id = specialClient.get_race_id(id)
-        test_horse_ids = raceClient.get_horse_ids(race_id)
-        test_horse = horseClient.get_horses(test_horse_ids)
 
-        ## 出馬表の取得
+        ## 出走馬情報を取得
         candidate_list = raceClient.get_candidate_list(race_id)
+
+        ## 出走馬のID取得
+        candidate_horse_ids = [candidate.horse_id for candidate in candidate_list]
+        candidate_horses = HorseClient().get_horses(candidate_horse_ids)
 
         # 学習用データ作成
         ## 過去分のレースid取得
-        train_race_ids = specialClient.get_past_race_ids(id)
+        train_race_ids = specialClient.get_past_race_ids(id, years)
 
         ## 過去分のレース結果取得
         train_race_results = RaceResultClient().get_race_results(train_race_ids)
 
-        ## 過去に出走した競走馬リストを取得
-        train_horse_ids = Usecase().get_horse_ids(train_race_results)
-        train_horses = horseClient.get_horses(train_horse_ids)
+        train_race_results.extend(candidate_list)
 
         ## csv出力
         exportRaceData = ExportRaceData()
-        result = exportRaceData.export_candidate_list(candidate_list, DatasetType.TEST)
-        result = exportRaceData.export_horse_history(test_horse, DatasetType.TEST)
-        result = exportRaceData.export_past_race_data_to_csv(train_race_results, DatasetType.TRAIN)
-        result = exportRaceData.export_horse_history(train_horses, DatasetType.TRAIN)
-        exportRaceData.compress_output()
-        
+        exportRaceData.export_past_race_data_to_csv(f'{name}_{years}年文の分析データ', train_race_results)
+        exportRaceData.export_horse_history(f'{name}_出走する馬の戦歴データ', candidate_horses)
+        result = exportRaceData.get_output_path()
         return jsonify({"data": result})
     except Exception as e:
         return jsonify({
@@ -77,3 +72,41 @@ def output_topic_race():
                 "message": str(e)
             }
         }), 500
+    
+@races_bp.route('/calculation', methods=['POST'])
+def get_processing_time():
+    data = request.get_json()  # JSONデータを取得
+    id = data.get('id')      # 'id'キーの値（配列）を取り出す
+    executions = data.get('executions')      # 'years'キーの値（配列）を取り出す
+    start = time.perf_counter()
+    specialClient = SpecialClient()
+    raceClient = RaceClient()
+
+    ## 今回出走する、競走馬の取得
+    race_id = specialClient.get_race_id(id)
+
+    ## 出走馬情報を取得
+    candidate_list = raceClient.get_candidate_list(race_id)
+
+    ## 出走馬のID取得
+    candidate_horse_ids = [candidate.horse_id for candidate in candidate_list]
+    HorseClient().get_horses(candidate_horse_ids)
+
+    # 学習用データ作成
+    ## 過去分のレースid取得
+    train_race_ids = specialClient.get_past_race_ids(id, 1)
+
+    ## 過去分のレース結果取得
+    train_race_results = RaceResultClient().get_race_results(train_race_ids)
+
+    train_race_results.extend(candidate_list)
+
+    end = time.perf_counter()
+
+    first_time = end - start
+    # print("---初期開始時間---")
+    # print(first_time)
+    # print("-----------------")
+    estimated_time = first_time + (executions - 1) * 2.0
+
+    return jsonify({"data": estimated_time})

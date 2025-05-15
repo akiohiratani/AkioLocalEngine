@@ -1,6 +1,5 @@
 import datetime
 from typing import List
-from domain.race_result_info import RaceResultInfoDto
 
 class Usecase:
     def get_holidays(self):
@@ -17,16 +16,57 @@ class Usecase:
                 formatted = current_day.strftime("%m/%d") + f"({weekdays_jp[current_day.weekday()]})"
                 weekends.append(formatted)
         return weekends
-    def get_horse_ids(self, raceResults:List[RaceResultInfoDto]):
-        """
-        レース結果から出場した馬のIdのリストを返却する
-        """
-        horse_ids = [raceResult.horse_id for raceResult in raceResults]
-        return list(set(horse_ids))
     
-    def get_joceky_ids(self, raceResults:List[RaceResultInfoDto]):
+    def get_racecourse_robust(self, race_id):
         """
-        レース結果から出場した騎手のIdのリストを返却する
+        レースIDから競馬場を特定する関数
         """
-        jockey_ids = [raceResult.jockey_id for raceResult in raceResults]
-        return list(set(jockey_ids))
+        try:
+            # 数値や他の型を文字列に変換
+            race_id_str = str(race_id).strip()
+            
+            # 文字列が数字のみで構成されているか確認
+            if not race_id_str.isdigit():
+                return ""
+            
+            # IDの長さをチェック
+            if len(race_id_str) < 12:
+                return ""
+            
+            # 競馬場コードを抽出
+            course_code = race_id_str[4:6]
+            
+            # 競馬場コードと競馬場名の対応表（拡張版）
+            racecourse_dict = {
+                "01": "札幌",
+                "02": "函館",
+                "03": "福島",
+                "04": "新潟",
+                "05": "東京",
+                "06": "中山",
+                "07": "中京",
+                "08": "京都",
+                "09": "阪神",
+                "10": "小倉",
+                # 以下は追加情報があれば拡張できます
+                # "11": "その他競馬場1",
+                # "12": "その他競馬場2",
+            }
+            
+            # 対応表から競馬場名を取得、不明な場合はコードも表示
+            return racecourse_dict.get(course_code)
+        
+        except Exception as e:
+            return ""
+    def get_activate(self):
+        # 今日の日付を取得
+        today = datetime.date.today()
+        
+        # 今年の09月30日を作成
+        this_year = today.year
+        october_first = datetime.date(this_year, 9, 30)
+        
+        # 今日が09月30日以前かどうかを判定
+        is_activate = today <= october_first
+        
+        return is_activate
