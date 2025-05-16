@@ -107,7 +107,8 @@ def get_processing_time():
     # print("---初期開始時間---")
     # print(first_time)
     # print("-----------------")
-    estimated_time = first_time + (executions - 1) * 2.0
+
+    estimated_time = (0.5636*executions*executions) + (1.379*executions) + first_time
 
     return jsonify({"data": estimated_time})
 
