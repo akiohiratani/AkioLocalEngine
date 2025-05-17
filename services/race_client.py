@@ -149,7 +149,7 @@ class RaceClient(BaseClient):
             # DTOを作成してリストに追加
             horse_list.append(
                 RaceResultInfoDto(
-                    type="未来",
+                    type="今週",
                     date="",
                     rank="",
                     frame_number=frame_number,
