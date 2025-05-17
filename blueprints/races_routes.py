@@ -61,7 +61,7 @@ def output_topic_race():
 
         ## csv出力
         exportRaceData = ExportRaceData()
-        exportRaceData.export_past_race_data_to_csv(f'{name}_{years}年文の分析データ', train_race_results)
+        exportRaceData.export_past_race_data_to_csv(f'{name}_{years}年分の分析データ', train_race_results)
         exportRaceData.export_horse_history(f'{name}_出走する馬の戦歴データ', candidate_horses)
         result = exportRaceData.get_output_path()
         return jsonify({"data": result})
